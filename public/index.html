@@ -11,7 +11,6 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 
-
   <script src="tetris.js"></script>
   <style>
     #retryButton {
@@ -54,10 +53,13 @@
       background-color: #e4e1db;
     }
 
-    #name {
-      background: #000000;
+    #name{
+      width: 100%;
+      text-align: center;
     }
+
     #name #nameInput{
+      top: 10%;
       position: absolute;
       left: 50%;
       z-index: 1;
@@ -82,7 +84,10 @@
   <div class="fb-share-button" data-href="https://www.baptiste.viloin.fr/tetris2" data-layout="button_count">
   </div>
 
-  <div id="name"></div>
+  <div id="name">
+     
+    <h3 id="nameLabel">toto</h3>
+  </div>
   <div id="tetris">
   </div>
   <div id="scoreboard">
@@ -99,6 +104,13 @@
   </tr>
 </table>-->
   </div>
+  <script>
+      if(navigator.language || navigator.userLanguage === "fr"){
+        $("#nameLabel").text("Renseigne ton nom pour enregistrer ton score");   
+      } else {
+        $("#nameLabel").text("Put your name to save your score");   
+      }
+  </script>
 </body>
 
 </html>
