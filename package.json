@@ -13,7 +13,7 @@
   "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "cd app && node app.js"
+    "start": "npm uninstall sqlite3 && npm install sqlite3 && cd app && node app.js"
   },
   "repository": {
     "type": "git",
