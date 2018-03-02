@@ -99,12 +99,28 @@ class TetrisManager {
         this.fallingShape.isFallingQuickly = true;
     }
 
-    checkForGameEnd(fallingShapePixel, pixel) {
-        if ((fallingShapePixel.y <= 2 * step) && (pixel.y === fallingShapePixel.y + step)) {
-            console.log("stopped");
-            var endGameEvent = new Event("endGame");
-            dispatchEvent(endGameEvent);
-        }
+    checkForFallingShapeCollision() {
+        this.shapes.forEach(function (shape) {
+            shape.pixels.forEach(function (pixel) {
+                this.fallingShape.pixels.forEach(function (fallingShapePixel) {
+                    if ((pixel.x === fallingShapePixel.x) && (pixel.y === fallingShapePixel.y + step)) {
+                        dispatchEvent(nextShape);
+                        if ((fallingShapePixel.y <= 2 * step) && (pixel.y === fallingShapePixel.y + step)) {
+                            console.log("stopped");
+                            var endGameEvent = new Event("endGame");
+                            dispatchEvent(endGameEvent);
+                        }
+                    }
+                });
+            }, this);
+        }, this);
+    }
+
+    draw() {
+        tetrisManager.fallingShape.draw();
+        tetrisManager.shapes.forEach(function (shape) {
+            shape.draw();
+        });
     }
 }
 
@@ -689,7 +705,6 @@ function keyPressed() {
         if (canMove) {
             tetrisManager.fallingShape.move("right");
         }
-        return false;
     } else if (keyCode === LEFT_ARROW) {
         var canMove = true;
         tetrisManager.shapes.forEach(function (shape) {
@@ -704,10 +719,8 @@ function keyPressed() {
         if (canMove) {
             tetrisManager.fallingShape.move("left");
         }
-        return false;
     } else if (keyCode === DOWN_ARROW) {
         tetrisManager.quickFall();
-        return false;
     } else if (keyCode === UP_ARROW) {
         var canRotate = true;
         var needsToMoveRight = 0;
@@ -751,8 +764,9 @@ function keyPressed() {
                 });
             }
         }
-        return false;
     }
+    drawGame();
+
 }
 
 function retry() {
@@ -837,43 +851,31 @@ function setup() {
     getScores(createScoreboard);
 }
 
-
-function draw() {
-    background(50);
-    // draw backgrounds
+function drawBackground() {
     fill(0, 0, 0);
     rect(0, 0, gameWidth + uiLineWidth, gameHeight);
     stroke(115, 115, 150);
     strokeWeight(uiLineWidth);
     fill(255, 255, 255);
     rect(gameWidth + uiLineWidth, 0, uiWidth, height);
+}
 
-
-    tetrisManager.fallingShape.draw();
-
-    tetrisManager.shapes.forEach(function (shape) {
-        shape.draw();
-    });
-
-    tetrisManager.shapes.forEach(function (shape) {
-        shape.pixels.forEach(function (pixel) {
-            tetrisManager.fallingShape.pixels.forEach(function (fallingShapePixel) {
-                if ((pixel.x === fallingShapePixel.x) && (pixel.y === fallingShapePixel.y + step)) {
-                    dispatchEvent(nextShape);
-                    tetrisManager.checkForGameEnd(fallingShapePixel, pixel);
-                }
-            });
-        });
-    });
-    if (tetrisManager.fallingShape.isFallingQuickly) {
-        tetrisManager.fallingShape.fall();
-    } else {
-        if (frameCount % levelManager.slowFactor === 0) {
-            tetrisManager.fallingShape.fall();
-        }
-    }
+function drawGame() {
+    drawBackground();
+    tetrisManager.draw();
+    tetrisManager.checkForFallingShapeCollision();
     tetrisManager.shapeGenerator.showNextShapes();
     scoreManager.showScore();
     levelManager.showLevel();
+}
+
+function draw() {
+    if (tetrisManager.fallingShape.isFallingQuickly) {
+        drawGame();
+        tetrisManager.fallingShape.fall();
+    } else if (frameCount % levelManager.slowFactor === 0) {
+        drawGame();
+        tetrisManager.fallingShape.fall();
+    }
 }
 
